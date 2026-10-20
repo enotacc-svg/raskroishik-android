@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#0b325e" />
+<meta name="description" content="Оптимальный раскрой плёнки и листовых материалов — схема PNG и отправка по email." />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" href="./icons/icon-192.png" type="image/png" />
+<link rel="stylesheet" href="./styles.css" />
+<title>Раскройщик — схема раскроя</title>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><rect x="5" y="5" width="30" height="30" rx="3" stroke="white" stroke-width="2"/><path d="M5 21h19V5M24 21v14M24 21h11M16 21v14" stroke="white" stroke-width="2"/></svg></div>
+<div class="brand"><h1>Раскройщик</h1><p>Плёнка · оконные блоки · листовые материалы</p></div>
+<div class="top-right"><button class="ghost" id="installBtn" type="button">Установить</button></div>
+</div></header>
+<main class="wrap layout">
+<section class="panel"><div class="panel-head"><h2>01. Размер рулона</h2><span class="mini">Сантиметры</span></div>
+<div class="grid">
+<label class="field"><span>Ширина рулона, см</span><input id="rollWidth" type="text" inputmode="decimal" value="152" placeholder="152" aria-label="Ширина рулона в сантиметрах" /></label>
+<label class="field"><span>Длина рулона, см</span><input id="rollLength" type="text" inputmode="decimal" placeholder="Без ограничения" aria-label="Длина рулона в сантиметрах" /></label>
+<label class="field"><span>Зазор между деталями, см</span><input id="gap" type="text" inputmode="decimal" value="0" placeholder="0" aria-label="Зазор между деталями в сантиметрах" /></label>
+</div>
+<label class="check"><input id="rotate" type="checkbox" checked />Разрешить поворот деталей на 90°</label>
+<p class="detail">Если длина не указана, программа подберёт необходимую длину рулона. Если указана — рассчитает количество рулонов.</p>
+</section>
+<section class="panel"><div class="panel-head"><h2>02. Детали для раскроя</h2><button class="linkbtn" type="button" id="demoBtn">Пример</button></div>
+<div class="blocks" id="blocks"></div>
+<div class="button-line"><button type="button" class="btn soft" id="addBlock">+ Оконный блок</button><button type="button" class="btn outline" id="clearBtn">Очистить всё</button></div>
+<div class="actions"><button id="calculateBtn" type="button" class="btn full">✂ Рассчитать раскрой</button></div>
+<p class="detail">Размеры вводятся в сантиметрах. Можно добавить несколько оконных блоков и любое количество деталей (до 300 штук в расчёте).</p>
+</section>
+<section class="panel result" id="resultPanel"><div class="panel-head"><h2>03. Готовая схема</h2><span class="mini" id="timeLabel"></span></div>
+<div class="stats" id="stats"></div>
+<div class="preview-wrap"><canvas id="previewCanvas" aria-label="Схема размещения деталей"></canvas></div>
+<div class="actions"><button type="button" class="btn ink" id="downloadBtn">↓ Сохранить PNG</button><button type="button" class="btn" id="shareBtn">✉ Отправить по email</button></div>
+<div class="email-row"><label class="field"><span>Email получателя (по желанию)</span><input id="email" type="email" autocomplete="email" placeholder="Введите адрес получателя" /></label><button class="btn outline" type="button" id="copyEmailBtn">Копировать адрес</button></div>
+<p class="hint">На Android нажми «Отправить по email» → выбери Gmail или другую почту. PNG прикрепится к письму. Если указан адрес, приложение попытается скопировать его для вставки в поле «Кому».</p>
+<p class="hint">Схема показывает фактическое размещение деталей. Для рулонов с заданной длиной неиспользованный остаток указывается в расчёте, но не растягивает изображение.</p>
+</section>
+<div class="install-note" id="installNote">Для установки на Android открой опубликованную по HTTPS версию в Chrome, затем в меню <b>⋮</b> выбери <b>Установить приложение</b> или <b>Добавить на главный экран</b>.</div>
+<p class="footer">Раскройщик • Данные хранятся на этом устройстве • Работает без интернета после установки</p>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="./core.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
