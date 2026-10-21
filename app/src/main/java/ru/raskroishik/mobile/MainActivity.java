@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        getWindow().setStatusBarColor(Color.rgb(11, 50, 94));
+        getWindow().setStatusBarColor(Color.rgb(11, 31, 59));
         getWindow().setNavigationBarColor(Color.rgb(240, 245, 250));
         webView = new WebView(this);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -58,6 +58,18 @@ public class MainActivity extends Activity {
     }
 
     public final class AndroidBridge {
+        @JavascriptInterface
+        public String getAppState() {
+            return getSharedPreferences("raskroishik_state", Context.MODE_PRIVATE).getString("payload", "");
+        }
+
+        @JavascriptInterface
+        public void setAppState(String value) {
+            boolean ok = getSharedPreferences("raskroishik_state", Context.MODE_PRIVATE)
+                    .edit().putString("payload", value).commit();
+            if (!ok) notifyUser("Не удалось сохранить данные на устройстве");
+        }
+
         @JavascriptInterface
         public void savePng(String dataUrl, String requestedName) {
             io.execute(() -> {

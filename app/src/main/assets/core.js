@@ -76,6 +76,62 @@
     }
     return {sheets, usedLength:sheets.reduce((sum,s)=>sum+s.usedLength,0)};
   }
+  // Гильотинная схема для ручной резки: сначала поперечные полосы,
+  // затем продольное разделение деталей внутри каждой полосы.
+  // Каждая полоса всегда режется по всей ширине рулона.
+  function arrangeManual(parts, W, L, gap, rotate, variant) {
+    const sorted = [...parts].sort((a,b) => {
+      const ah=Math.max(a.w,a.h),bh=Math.max(b.w,b.h);
+      if (variant===0) return bh-ah || b.w*b.h-a.w*a.h;
+      if (variant===1) return b.w*b.h-a.w*a.h || bh-ah;
+      if (variant===2) return Math.min(b.w,b.h)-Math.min(a.w,a.h) || bh-ah;
+      return b.h-a.h || b.w-a.w;
+    });
+    const sheets=[{pieces:[],usedLength:0,bands:[]}];
+    let sheet=sheets[0];
+    let band=null;
+    const maxL=L||Number.POSITIVE_INFINITY;
+    for(const p of sorted) {
+      let options=[{w:p.w,h:p.h,flipped:false}];
+      if(rotate&&p.w!==p.h) options.push({w:p.h,h:p.w,flipped:true});
+      options=options.filter(o=>o.w<=W && o.h<=maxL);
+      if(!options.length)return null;
+      const candidate=[];
+      if(band) for(const o of options){
+        const remaining=W-band.nextX;
+        const addedHeight=Math.max(0,o.h-band.height);
+        if(o.w+(band.items.length?gap:0)<=remaining && band.y+band.height+addedHeight<=maxL){
+          // Tiny tolerance favors sharing a row of similarly high pieces.
+          candidate.push({o,newBand:false,score:addedHeight*W*6 + (band.height-o.h > 0 ? Math.abs(band.height-o.h)*o.w*.3:0) + (remaining-o.w)*.03});
+        }
+      }
+      for(const o of options){
+        const y=band ? band.y+band.height+gap : 0;
+        if(y+o.h<=maxL)candidate.push({o,newBand:true,score:o.h*W + (W-o.w)*.04 + (band?W*gap:0)});
+      }
+      candidate.sort((a,b)=>a.score-b.score || Number(a.newBand)-Number(b.newBand));
+      let choice=candidate[0];
+      if(!choice){
+        sheet={pieces:[],usedLength:0,bands:[]};sheets.push(sheet);band=null;
+        options.sort((a,b)=>a.h-b.h || b.w-a.w);
+        choice={o:options[0],newBand:true};
+      }
+      if(choice.newBand){
+        const y=band ? band.y+band.height+gap : 0;
+        band={y,height:choice.o.h,nextX:0,items:[]};
+        sheet.bands.push(band);
+      }
+      const x=band.items.length ? band.nextX+gap : 0;
+      const o=choice.o;
+      const piece={...p,x,y:band.y,w:o.w,h:o.h,rotated:o.flipped};
+      band.items.push(piece.id);
+      band.nextX=x+o.w;
+      band.height=Math.max(band.height,o.h);
+      sheet.pieces.push(piece);
+      sheet.usedLength=Math.max(sheet.usedLength,band.y+band.height);
+    }
+    return {sheets,usedLength:sheets.reduce((s,v)=>s+v.usedLength,0)};
+  }
   function solve(data) {
     const W = toMM(data.rollWidth);
     const L = data.rollLength === '' || data.rollLength === undefined || data.rollLength === null ? 0 : toMM(data.rollLength);
@@ -109,9 +165,18 @@
       (a,b) => (b.w+b.h)-(a.w+a.h),
       (a,b) => Math.min(b.w,b.h)-Math.min(a.w,a.h)
     ];
+    const manual=data.mode==='manual';
     let best = null;
+    if (manual) {
+      for(let i=0;i<4;i++){
+        const r=arrangeManual(parts,W,L,gap,rotate,i);
+        if(!r)continue;
+        const score=L ? r.sheets.length*1e12+r.usedLength : r.usedLength;
+        if(!best || score<best.score)best={...r,score};
+      }
+    }
     const attempts = parts.length > 170 ? 3 : measures.length;
-    for (let i=0;i<attempts;i++) {
+    for (let i=0;!manual && i<attempts;i++) {
       for (const method of ['bottom','area','short']) {
         const result = arrange(parts,W,L,gap,rotate,method,measures[i]);
         if (!result) continue;
@@ -124,8 +189,8 @@
     const materialArea=W*(L ? L*best.sheets.length : best.usedLength);
     const usedPercent=Math.min(100,100*totalArea/materialArea);
     return {
-      rollWidth:W,rollLength:L,gap,rotate,
-      sheets:best.sheets.map((sheet,i)=>({index:i+1,pieces:sheet.pieces,usedLength:sheet.usedLength})),
+      rollWidth:W,rollLength:L,gap,rotate,mode:manual?'manual':'economy',
+      sheets:best.sheets.map((sheet,i)=>({index:i+1,pieces:sheet.pieces,usedLength:sheet.usedLength,bands:(sheet.bands||[]).map(b=>({y:b.y,height:b.height,items:[...b.items]}))})),
       count:parts.length,usedLength:best.usedLength,totalArea,materialArea,wasteArea:Math.max(0,materialArea-totalArea),
       efficiency:usedPercent, estimatedMeters:best.usedLength/1000, // mm to m
       blocks:data.blocks.map(b=>({id:b.id,name:b.name})),

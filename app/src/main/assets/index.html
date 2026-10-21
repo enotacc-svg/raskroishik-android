@@ -3,46 +3,139 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<meta name="theme-color" content="#0b325e" />
-<meta name="description" content="Оптимальный раскрой плёнки и листовых материалов — схема PNG и отправка по email." />
+<meta name="theme-color" content="#0B1F3B" />
 <link rel="manifest" href="./manifest.webmanifest" />
+<meta name="description" content="Раскрой плёнки, история заказов и учёт остатков рулонов." />
+
 <link rel="icon" href="./icons/icon-192.png" type="image/png" />
 <link rel="stylesheet" href="./styles.css" />
-<title>Раскройщик — схема раскроя</title>
+<title>МОЕМ ВСЁ 360 — Раскройщик</title>
 </head>
 <body>
-<header class="top"><div class="wrap">
-<div class="mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><rect x="5" y="5" width="30" height="30" rx="3" stroke="white" stroke-width="2"/><path d="M5 21h19V5M24 21v14M24 21h11M16 21v14" stroke="white" stroke-width="2"/></svg></div>
-<div class="brand"><h1>Раскройщик</h1><p>Плёнка · оконные блоки · листовые материалы</p></div>
-<div class="top-right"><button class="ghost" id="installBtn" type="button">Установить</button></div>
-</div></header>
-<main class="wrap layout">
-<section class="panel"><div class="panel-head"><h2>01. Размер рулона</h2><span class="mini">Сантиметры</span></div>
-<div class="grid">
-<label class="field"><span>Ширина рулона, см</span><input id="rollWidth" type="text" inputmode="decimal" value="152" placeholder="152" aria-label="Ширина рулона в сантиметрах" /></label>
-<label class="field"><span>Длина рулона, см</span><input id="rollLength" type="text" inputmode="decimal" placeholder="Без ограничения" aria-label="Длина рулона в сантиметрах" /></label>
-<label class="field"><span>Зазор между деталями, см</span><input id="gap" type="text" inputmode="decimal" value="0" placeholder="0" aria-label="Зазор между деталями в сантиметрах" /></label>
-</div>
-<label class="check"><input id="rotate" type="checkbox" checked />Разрешить поворот деталей на 90°</label>
-<p class="detail">Если длина не указана, программа подберёт необходимую длину рулона. Если указана — рассчитает количество рулонов.</p>
+<header class="top brand-top">
+  <div class="wrap topbar">
+    <div class="brand-shell">
+      <img class="brand-avatar" src="./icons/brand-avatar.png" alt="Логотип Моем всё 360" />
+      <div class="brand-copy">
+        <div class="brand-chip">МОЕМ ВСЁ 360</div>
+        <h1>Раскройщик</h1>
+        <p id="subtitle">Раскрой · ручная резка · учёт рулонов</p>
+        <span class="release-version">Версия 2.4.1 · исправлено лого</span>
+      </div>
+    </div>
+    <div class="top-right"><button class="ghost" id="installBtn" type="button">Установить</button></div>
+  </div>
+</header>
+
+<main class="wrap layout layout-bottom-nav">
+<section class="view active" id="view-cut" data-view="cut">
+ <div class="view-heading friendly-heading">
+   <h2>Раскрой</h2>
+   <p>Выбери рулон, добавь детали и получи понятную схему раскроя.</p>
+ </div>
+ <section class="welcome-card">
+   <div class="welcome-left">
+     <div class="welcome-title">Быстрый старт</div>
+     <div class="welcome-text">1. Выбери рулон или введи размеры вручную. 2. Добавь детали. 3. Нажми «Рассчитать раскрой».</div>
+   </div>
+   <div class="welcome-badges">
+     <span>Экономия материала</span>
+     <span>Удобство ручной резки</span>
+     <span>PNG и email</span>
+   </div>
+ </section>
+ <section class="panel">
+   <div class="panel-head"><h2>01. Материал</h2><span class="mini">Сантиметры</span></div>
+   <label class="field"><span>Рулон из учёта</span><select id="stockSelect" aria-label="Выбор рулона"><option value="">Без привязки к складу — свои размеры</option></select></label>
+   <div class="stock-hint" id="selectedRollInfo">Можно выбрать рулон из остатков или указать размеры вручную.</div>
+   <div class="grid" style="margin-top:13px">
+     <label class="field"><span>Ширина рулона, см</span><input id="rollWidth" type="text" inputmode="decimal" value="152" aria-label="Ширина рулона в сантиметрах" /></label>
+     <label class="field"><span>Длина рулона, см</span><input id="rollLength" type="text" inputmode="decimal" placeholder="Без ограничения" aria-label="Длина рулона в сантиметрах" /></label>
+     <label class="field"><span>Зазор между деталями, см</span><input id="gap" type="text" inputmode="decimal" value="0" aria-label="Зазор между деталями в сантиметрах" /></label>
+   </div>
+   <label class="check"><input id="rotate" type="checkbox" checked />Разрешить поворот деталей на 90°</label>
+   <div class="mode-title">Приоритет расчёта</div>
+   <div class="mode-options">
+     <label class="mode-option"><input type="radio" name="cutMode" value="manual" checked /><span><strong>Удобство резки</strong><small>Прямые поперечные полосы, затем простые продольные резы</small></span></label>
+     <label class="mode-option"><input type="radio" name="cutMode" value="economy" /><span><strong>Экономия материала</strong><small>Более плотная укладка; резать вручную может быть сложнее</small></span></label>
+   </div>
+   <p class="detail">При выборе складского рулона его ширина и доступная длина подставляются автоматически. Пробные расчёты не уменьшают остаток.</p>
+ </section>
+ <section class="panel">
+   <div class="panel-head"><h2>02. Детали для раскроя</h2><button class="linkbtn" type="button" id="demoBtn">Заполнить пример</button></div>
+   <div class="blocks" id="blocks"></div>
+   <div class="button-line"><button type="button" class="btn soft" id="addBlock">+ Оконный блок</button><button type="button" class="btn outline" id="clearBtn">Очистить всё</button></div>
+   <div class="actions"><button id="calculateBtn" type="button" class="btn full">✂ Рассчитать раскрой</button></div>
+   <p class="detail">Размеры — в сантиметрах. До 300 деталей в одном расчёте.</p>
+ </section>
+ <section class="panel result" id="resultPanel">
+   <div class="panel-head"><h2>03. Готовая схема</h2><span class="mini" id="timeLabel"></span></div>
+   <div class="result-subheading" id="resultSubheading"></div>
+   <div class="stats" id="stats"></div>
+   <div id="cutInstructions" class="cut-instructions" hidden></div>
+   <div class="stock-deduction" id="deductionArea"></div>
+   <div class="preview-wrap"><canvas id="previewCanvas" aria-label="Схема размещения деталей"></canvas></div>
+   <div class="actions"><button type="button" class="btn ink" id="downloadBtn">↓ Сохранить PNG</button><button type="button" class="btn" id="shareBtn">✉ Отправить по email</button></div>
+   <div class="email-row"><label class="field"><span>Email получателя (по желанию)</span><input id="email" type="email" autocomplete="email" placeholder="Введите адрес получателя" /></label><button class="btn outline" type="button" id="copyEmailBtn">Копировать адрес</button></div>
+   <p class="hint">На Android «Отправить по email» открывает системное меню: выбери Gmail или почтовое приложение. Изображение PNG прикрепится к письму.</p>
+ </section>
 </section>
-<section class="panel"><div class="panel-head"><h2>02. Детали для раскроя</h2><button class="linkbtn" type="button" id="demoBtn">Пример</button></div>
-<div class="blocks" id="blocks"></div>
-<div class="button-line"><button type="button" class="btn soft" id="addBlock">+ Оконный блок</button><button type="button" class="btn outline" id="clearBtn">Очистить всё</button></div>
-<div class="actions"><button id="calculateBtn" type="button" class="btn full">✂ Рассчитать раскрой</button></div>
-<p class="detail">Размеры вводятся в сантиметрах. Можно добавить несколько оконных блоков и любое количество деталей (до 300 штук в расчёте).</p>
+
+<section class="view" id="view-history" data-view="history">
+ <div class="view-heading friendly-heading"><h2>История раскроек</h2><p>Здесь сохраняются схемы, параметры и операции списания материала.</p></div>
+ <section class="welcome-card secondary-card">
+   <div class="welcome-left">
+     <div class="welcome-title">Подсказка</div>
+     <div class="welcome-text">Открывай прошлые схемы, повторно используй их как шаблон и при необходимости отменяй списание.</div>
+   </div>
+ </section>
+ <div id="historyList" class="record-list"></div>
 </section>
-<section class="panel result" id="resultPanel"><div class="panel-head"><h2>03. Готовая схема</h2><span class="mini" id="timeLabel"></span></div>
-<div class="stats" id="stats"></div>
-<div class="preview-wrap"><canvas id="previewCanvas" aria-label="Схема размещения деталей"></canvas></div>
-<div class="actions"><button type="button" class="btn ink" id="downloadBtn">↓ Сохранить PNG</button><button type="button" class="btn" id="shareBtn">✉ Отправить по email</button></div>
-<div class="email-row"><label class="field"><span>Email получателя (по желанию)</span><input id="email" type="email" autocomplete="email" placeholder="Введите адрес получателя" /></label><button class="btn outline" type="button" id="copyEmailBtn">Копировать адрес</button></div>
-<p class="hint">На Android нажми «Отправить по email» → выбери Gmail или другую почту. PNG прикрепится к письму. Если указан адрес, приложение попытается скопировать его для вставки в поле «Кому».</p>
-<p class="hint">Схема показывает фактическое размещение деталей. Для рулонов с заданной длиной неиспользованный остаток указывается в расчёте, но не растягивает изображение.</p>
+
+<section class="view" id="view-stock" data-view="stock">
+ <div class="view-heading friendly-heading"><h2>Рулоны и остатки</h2><p>Добавляй рулоны, контролируй остатки и смотри журнал списаний.</p></div>
+ <section class="welcome-card secondary-card">
+   <div class="welcome-left">
+     <div class="welcome-title">Как пользоваться</div>
+     <div class="welcome-text">Добавь новый рулон один раз, а дальше выбирай его в раскрое. Остаток уменьшится только после подтверждения списания.</div>
+   </div>
+ </section>
+ <section class="panel" id="stockFormPanel"><div class="panel-head"><h2 id="stockFormTitle">Добавить рулон</h2><button class="linkbtn" type="button" id="resetStockForm">Сбросить</button></div>
+ <form id="stockForm" novalidate autocomplete="off">
+ <input type="hidden" id="editRollId" />
+ <label class="field"><span>Название / маркировка</span><input id="stockName" placeholder="Например, Бронеплёнка 300 мкм" maxlength="75" required /></label>
+ <div class="grid" style="margin-top:13px">
+ <label class="field"><span>Ширина, см</span><input id="stockWidth" type="text" inputmode="decimal" placeholder="152" required /></label>
+ <label class="field"><span>Общая длина, см</span><input id="stockTotal" type="text" inputmode="decimal" placeholder="3000" required /></label>
+ <label class="field"><span>Осталось, см (необязательно)</span><input id="stockRemaining" type="text" inputmode="decimal" placeholder="Если пусто — равняется общей длине" /></label>
+ </div>
+ <p class="detail">Для нового рулона «Осталось» заполняется автоматически из общей длины. Для обрезка можно указать его фактические размеры.</p>
+ <div class="actions"><button type="button" class="btn" id="saveRollBtn">+ Сохранить рулон</button></div>
+ <div id="stockStatus" class="stock-status" role="status" aria-live="polite" hidden></div>
+ <div id="saveDiagnostics" class="diagnostics">Версия 2.4 · сохранение: готово</div>
+ </form></section>
+ <section class="panel"><div class="panel-head"><h2>Склад рулонов</h2><span class="mini" id="stockCount"></span></div><div class="stock-totals" id="stockTotals"></div><div id="stockList" class="record-list"></div></section>
+ <section class="panel"><div class="panel-head"><h2>Операции списания</h2></div><div id="stockLog" class="record-list"></div></section>
 </section>
+
 <div class="install-note" id="installNote">Для установки на Android открой опубликованную по HTTPS версию в Chrome, затем в меню <b>⋮</b> выбери <b>Установить приложение</b> или <b>Добавить на главный экран</b>.</div>
-<p class="footer">Раскройщик • Данные хранятся на этом устройстве • Работает без интернета после установки</p>
+<p class="footer">МОЕМ ВСЁ 360 • Раскройщик • Локальное хранение на устройстве • Интернет для расчётов не нужен</p>
 </main>
+
+<nav class="bottom-nav" aria-label="Основная навигация">
+  <button class="nav-link active" type="button" data-go="cut"><span class="bottom-icon">✂</span><span>Раскрой</span></button>
+  <button class="nav-link" type="button" data-go="history"><span class="bottom-icon">🕘</span><span>История</span></button>
+  <button class="nav-link" type="button" data-go="stock"><span class="bottom-icon">🧾</span><span>Рулоны</span></button>
+</nav>
+
+<div class="confirm-overlay" id="confirmOverlay" hidden>
+ <section class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+  <div class="confirm-label">Проверка операции</div>
+  <h2 id="confirmTitle">Подтверждение</h2>
+  <p id="confirmMessage"></p>
+  <div class="confirm-actions"><button class="btn outline" id="confirmCancel" type="button">Отмена</button><button class="btn" id="confirmAccept" type="button">Подтвердить</button></div>
+ </section>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="./core.js"></script>
 <script src="./app.js"></script>

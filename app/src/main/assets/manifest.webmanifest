@@ -1,13 +1,20 @@
 {
- "name":"Раскройщик — плёнка и оконные блоки",
- "short_name":"Раскройщик",
- "description":"Раскрой рулонов и отправка схемы PNG",
- "start_url":"./index.html",
- "scope":"./",
- "id":"./index.html",
- "display":"standalone",
- "background_color":"#f2f5fb",
- "theme_color":"#0b325e",
- "lang":"ru",
- "icons":[{"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+  "name": "МОЕМ ВСЁ 360 — Раскройщик",
+  "short_name": "Раскройщик",
+  "description": "Раскрой плёнки, история, учёт рулонов и отправка PNG",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "background_color": "#F7FAFF",
+  "theme_color": "#0B1F3B",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
